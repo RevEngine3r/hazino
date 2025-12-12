@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Hazino</string>
+    <string name="w_expense">Vanished!</string>
+    <string name="w_income">Deposited</string>
+</resources>
