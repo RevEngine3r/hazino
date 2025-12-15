@@ -11,14 +11,14 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 @Database(
-    entities = [TransactionEntity::class],
-    version = 1,
+    entities = [TransactionEntity::class, TransactionListEntity::class],
+    version = 2,
     exportSchema = false
 )
-
 @TypeConverters(LocalDateTimeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
+    abstract fun transactionListDao(): TransactionListDao
 }
 
 class LocalDateTimeConverter {

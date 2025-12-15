@@ -9,9 +9,25 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 @Module
-@InstallIn(SingletonComponent::class) // This makes it a singleton
+@InstallIn(SingletonComponent::class)
 object DatabaseModule {
+
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE `transaction_lists` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)"
+            )
+            database.execSQL("INSERT INTO transaction_lists (name) VALUES ('Personal')")
+            database.execSQL("ALTER TABLE `transactions` ADD COLUMN `listId` INTEGER NOT NULL DEFAULT 1")
+        }
+    }
 
     @Provides
     @Singleton
@@ -19,14 +35,28 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java,
-            "wallet_database" // Your database name from the companion object
-        ).build()
+            "wallet_database"
+        ).addMigrations(MIGRATION_1_2)
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    // Create a default "Personal" list when the database is created
+                    db.execSQL("INSERT INTO transaction_lists (name) VALUES ('Personal')")
+                }
+            })
+            .build()
     }
 
     @Provides
-    @Singleton // Not strictly needed if AppDatabase is a singleton, but good practice
+    @Singleton
     fun provideTransactionDao(appDatabase: AppDatabase): TransactionDao {
         return appDatabase.transactionDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTransactionListDao(appDatabase: AppDatabase): TransactionListDao {
+        return appDatabase.transactionListDao()
     }
 }
 

@@ -29,34 +29,76 @@ fun WalletScreen(
     viewModel: WalletViewModel,
 ) {
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
+    val transactionLists by viewModel.transactionLists.collectAsStateWithLifecycle()
+    val selectedListId by viewModel.selectedListId.collectAsStateWithLifecycle()
 
-    // State for the bottom sheet visibility
+    val selectedList = transactionLists.find { it.id == selectedListId }
+
     var showBottomSheet by remember { mutableStateOf(false) }
-
-    // State for form inputs only
     var amountInput by remember { mutableStateOf("") }
     var captionInput by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-
-    // Modal Bottom Sheet State
     val bottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-
     var showDeleteSheet by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
+    var showAddListDialog by remember { mutableStateOf(false) }
+
+    if (showAddListDialog) {
+        AddListDialog(
+            onDismiss = { showAddListDialog = false },
+            onAdd = { listName ->
+                viewModel.addTransactionList(listName)
+                showAddListDialog = false
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Wallet") },
+                title = { Text(selectedList?.name ?: "Wallet") },
                 actions = {
-                    Icon(
-                        Icons.Default.DeleteSweep, contentDescription = "delete all",
-                        modifier = Modifier
-                            .padding(horizontal = 15.dp)
-                            .clickable {
-                                showDeleteSheet = true
+                    IconButton(onClick = { showDeleteSheet = true }) {
+                        Icon(
+                            Icons.Default.DeleteSweep,
+                            contentDescription = "Delete all transactions in this list"
+                        )
+                    }
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        transactionLists.forEach { list ->
+                            DropdownMenuItem(
+                                text = { Text(list.name) },
+                                onClick = {
+                                    viewModel.selectList(list.id)
+                                    showMenu = false
+                                }
+                            )
+                        }
+                        Divider()
+                        DropdownMenuItem(
+                            text = { Text("Add New List") },
+                            onClick = {
+                                showAddListDialog = true
+                                showMenu = false
                             }
-                    )
+                        )
+                        if (transactionLists.size > 1) {
+                            DropdownMenuItem(
+                                text = { Text("Delete Current List") },
+                                onClick = {
+                                    viewModel.deleteTransactionList(selectedListId)
+                                    showMenu = false
+                                }
+                            )
+                        }
+                    }
                 }
             )
         },
