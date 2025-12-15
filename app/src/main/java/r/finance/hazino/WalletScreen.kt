@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,11 +28,11 @@ import java.time.LocalDateTime
 @Composable
 fun WalletScreen(
     viewModel: WalletViewModel,
+    onOpenDrawer: () -> Unit,
 ) {
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
     val transactionLists by viewModel.transactionLists.collectAsStateWithLifecycle()
     val selectedListId by viewModel.selectedListId.collectAsStateWithLifecycle()
-
     val selectedList = transactionLists.find { it.id == selectedListId }
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -41,63 +42,22 @@ fun WalletScreen(
     val bottomSheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showDeleteSheet by remember { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
-    var showAddListDialog by remember { mutableStateOf(false) }
-
-    if (showAddListDialog) {
-        AddListDialog(
-            onDismiss = { showAddListDialog = false },
-            onAdd = { listName ->
-                viewModel.addTransactionList(listName)
-                showAddListDialog = false
-            }
-        )
-    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(selectedList?.name ?: "Wallet") },
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(Icons.Default.Menu, contentDescription = "Open drawer")
+                    }
+                },
                 actions = {
                     IconButton(onClick = { showDeleteSheet = true }) {
                         Icon(
                             Icons.Default.DeleteSweep,
                             contentDescription = "Delete all transactions in this list"
                         )
-                    }
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        transactionLists.forEach { list ->
-                            DropdownMenuItem(
-                                text = { Text(list.name) },
-                                onClick = {
-                                    viewModel.selectList(list.id)
-                                    showMenu = false
-                                }
-                            )
-                        }
-                        Divider()
-                        DropdownMenuItem(
-                            text = { Text("Add New List") },
-                            onClick = {
-                                showAddListDialog = true
-                                showMenu = false
-                            }
-                        )
-                        if (transactionLists.size > 1) {
-                            DropdownMenuItem(
-                                text = { Text("Delete Current List") },
-                                onClick = {
-                                    viewModel.deleteTransactionList(selectedListId)
-                                    showMenu = false
-                                }
-                            )
-                        }
                     }
                 }
             )
