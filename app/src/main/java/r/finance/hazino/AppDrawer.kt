@@ -18,6 +18,7 @@ fun AppDrawer(
     onCloseDrawer: () -> Unit
 ) {
     val transactionLists by viewModel.transactionLists.collectAsStateWithLifecycle()
+    val selectedListId by viewModel.selectedListId.collectAsStateWithLifecycle()
     var showAddListSheet by remember { mutableStateOf(false) }
     var listToDelete by remember { mutableStateOf<TransactionListEntity?>(null) }
 
@@ -59,7 +60,7 @@ fun AppDrawer(
                             }
                         }
                     },
-                    selected = false,
+                    selected = list.id == selectedListId,
                     onClick = {
                         viewModel.selectList(list.id)
                         onCloseDrawer()
