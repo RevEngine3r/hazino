@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.ui.graphics.Color
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteListSheet(
@@ -22,12 +24,10 @@ fun DeleteListSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text("Delete List", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(16.dp))
             Text("Are you sure you want to delete the list \"$listName\"? This action cannot be undone.")
-            Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -36,9 +36,9 @@ fun DeleteListSheet(
                     Text("Cancel")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(
+                TextButton(
                     onClick = onDelete,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFE91E63))
                 ) {
                     Text("Delete")
                 }
