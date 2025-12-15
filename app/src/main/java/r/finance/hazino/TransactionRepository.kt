@@ -6,7 +6,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TransactionRepository @Inject constructor(private val dao: TransactionDao) {
-    val allTransactions: Flow<List<TransactionEntity>> = dao.getAllTransactions()
+    fun getAllTransactions(listId: Long): Flow<List<TransactionEntity>> =
+        dao.getAllTransactions(listId)
 
     suspend fun addTransaction(transaction: TransactionEntity) {
         dao.insertTransaction(transaction)
@@ -16,7 +17,7 @@ class TransactionRepository @Inject constructor(private val dao: TransactionDao)
         dao.deleteTransaction(transaction)
     }
 
-    suspend fun deleteAllTransactions() {
-        dao.deleteAllTransactions()
+    suspend fun deleteAllTransactions(listId: Long) {
+        dao.deleteAllTransactions(listId)
     }
 }

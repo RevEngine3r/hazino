@@ -29,6 +29,9 @@ fun SummaryScreen(
     modifier: Modifier = Modifier
 ) {
     val transactions by viewModel.transactions.collectAsStateWithLifecycle()
+    val transactionLists by viewModel.transactionLists.collectAsStateWithLifecycle()
+    val selectedListId by viewModel.selectedListId.collectAsStateWithLifecycle()
+    val selectedList = transactionLists.find { it.id == selectedListId }
 
     val (totalBalance, totalIncome, totalExpense) = remember(transactions) {
         var balance = 0.0
@@ -50,7 +53,9 @@ fun SummaryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Summary") })
+            TopAppBar(
+                title = { Text(selectedList?.name?.let { "$it Summary" } ?: "Summary") }
+            )
         },
     )
     { innerPadding ->
