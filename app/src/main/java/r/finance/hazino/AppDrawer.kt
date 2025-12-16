@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ fun AppDrawer(
     val selectedListId by viewModel.selectedListId.collectAsStateWithLifecycle()
     var showAddListSheet by remember { mutableStateOf(false) }
     var listToDelete by remember { mutableStateOf<TransactionListEntity?>(null) }
+    var listToRename by remember { mutableStateOf<TransactionListEntity?>(null) }
 
     if (showAddListSheet) {
         AddListSheet(
@@ -28,6 +30,17 @@ fun AppDrawer(
             onAdd = { listName ->
                 viewModel.addTransactionList(listName)
                 showAddListSheet = false
+            }
+        )
+    }
+
+    listToRename?.let { list ->
+        RenameListSheet(
+            listName = list.name,
+            onDismiss = { listToRename = null },
+            onRename = { newName ->
+                viewModel.updateTransactionList(list.copy(name = newName))
+                listToRename = null
             }
         )
     }
@@ -44,18 +57,34 @@ fun AppDrawer(
     }
 
     ModalDrawerSheet {
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(transactionLists) { list ->
-                NavigationDrawerItem(
-                    label = {
-                        Row(
+        ReorderableList(
+            items = transactionLists,
+            onMove = { from, to ->
+                val updatedLists = transactionLists.toMutableList().apply {
+                    add(to, removeAt(from))
+                }
+                updatedLists.forEachIndexed { index, list ->
+                    viewModel.updateTransactionList(list.copy(listOrder = index))
+                }
+            },
+            key = { it.id },
+            modifier = Modifier.weight(1f)
+        ) { list ->
+            NavigationDrawerItem(
+                label = {
+                    Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(list.name)
                             if (transactionLists.size > 1) {
-                                IconButton(onClick = { listToDelete = list }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete list")
+                                Row {
+                                    IconButton(onClick = { listToRename = list }) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Rename list")
+                                    }
+                                    IconButton(onClick = { listToDelete = list }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Delete list")
+                                    }
                                 }
                             }
                         }

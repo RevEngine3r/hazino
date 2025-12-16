@@ -12,6 +12,10 @@ class TransactionListRepository @Inject constructor(private val dao: Transaction
         dao.insert(transactionList)
     }
 
+    suspend fun updateTransactionList(transactionList: TransactionListEntity) {
+        dao.update(transactionList.id, transactionList.name, transactionList.listOrder)
+    }
+
     suspend fun deleteTransactionList(listId: Long) {
         dao.delete(listId)
     }

@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import java.time.Instant
@@ -12,7 +14,7 @@ import java.time.ZoneOffset
 
 @Database(
     entities = [TransactionEntity::class, TransactionListEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(LocalDateTimeConverter::class)
