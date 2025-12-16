@@ -59,7 +59,18 @@ class WalletViewModel @Inject constructor(
 
     fun addTransactionList(name: String) {
         viewModelScope.launch {
-            transactionListRepository.addTransactionList(TransactionListEntity(name = name))
+            val currentList = transactionLists.value
+            val newList = TransactionListEntity(
+                name = name,
+                listOrder = currentList.size
+            )
+            transactionListRepository.addTransactionList(newList)
+        }
+    }
+
+    fun updateTransactionList(transactionList: TransactionListEntity) {
+        viewModelScope.launch {
+            transactionListRepository.updateTransactionList(transactionList)
         }
     }
 
