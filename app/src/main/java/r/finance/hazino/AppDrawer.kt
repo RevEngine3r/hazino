@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import r.finance.hazino.R
 
 @Composable
 fun AppDrawer(
@@ -129,6 +130,7 @@ fun AppDrawer(
             )
         }
     }
+
     NavigationDrawerItem(
         label = { Text("Add New List") },
         selected = false,
