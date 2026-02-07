@@ -45,7 +45,7 @@ object DatabaseModule {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     // Create a default "Personal" list when the database is created
-                    db.execSQL("INSERT INTO transaction_lists (name) VALUES ('Personal')")
+                    db.execSQL("INSERT INTO transaction_lists (name, listOrder) VALUES ('Personal', 0)")
                 }
             })
             .build()
