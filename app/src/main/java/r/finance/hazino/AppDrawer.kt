@@ -129,13 +129,14 @@ fun AppDrawer(
                 icon = {}
             )
         }
+        
+        NavigationDrawerItem(
+            label = { Text("Add New List") },
+            selected = false,
+            onClick = { showAddListSheet = true },
+            icon = { Icon(Icons.Default.Add, contentDescription = "Add new list") },
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
     }
-
-    NavigationDrawerItem(
-        label = { Text("Add New List") },
-        selected = false,
-        onClick = { showAddListSheet = true },
-        icon = { Icon(Icons.Default.Add, contentDescription = "Add new list") }
-    )
 }
 
